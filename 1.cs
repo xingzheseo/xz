@@ -1,3 +1,56 @@
+public void Run(Dictionary<string, string> stringDic, Dictionary<string, List<string>> listDic, Dictionary<string, int> intDic, Dictionary<string, Dictionary<string, string>> rowDic, Dictionary<string, DataTable> tableDic)
+{
+    var ua = GenerateUserAgentString(stringDic["u"]);
+    stringDic.Add("ua", ua);
+
+    Console.WriteLine(ua);
+}
+
+private static readonly Random randomInstance = new Random();
+
+public static string GenerateUserAgentString(string platform)
+{
+    switch (platform)
+    {
+        case "Android":
+            return GetChromeUserAgentString(Platform.Mobile);
+        case "ios":
+            var ua = GetChromeUserAgentString(Platform.Mobile);
+            ua = ua.Replace("Linux", "iPhone");
+            ua = ua.Replace("Mobile Safari", "Version/15.0 Mobile Safari");
+            return ua;
+        case "win":
+            return GetChromeUserAgentString(Platform.Desktop);
+        case "mac":
+            return GetMacUserAgentString();
+        default:
+            return GetChromeUserAgentString(Platform.Desktop);
+    }
+}
+
+public static string GetMacUserAgentString()
+{
+    var webkitVersion = GetRandomResource("ChromeWebkitVersion");
+    var chromeVersion = GetRandomResource("ChromeVersion");
+
+    return "Mozilla/5.0 (Macintosh; Intel Mac OS X " + GetRandomResource("MacOSVersion") + ") AppleWebKit/" + webkitVersion + " (KHTML, like Gecko) Chrome/" + chromeVersion + " Safari/" + webkitVersion;
+}
+
+public static string GetChromeUserAgentString(Platform platform)
+{
+    var webkitVersion = GetRandomResource("ChromeWebkitVersion");
+    var chromeVersion = GetRandomResource("ChromeVersion");
+
+    switch (platform)
+    {
+        case Platform.Desktop:
+            return "Mozilla/5.0 (" + GetRandomResource("os") + ") AppleWebKit/" + webkitVersion + " (KHTML, like Gecko) Chrome/" + chromeVersion + " Safari/" + webkitVersion;
+        case Platform.Mobile:
+            return "Mozilla/5.0 (Linux; Android " + GetRandomResource("AndroidVersion") + "; " + GetRandomResource("Device") + ") AppleWebKit/" + webkitVersion + " (KHTML, like Gecko) Chrome/" + chromeVersion + " Mobile Safari/" + webkitVersion;
+        default:
+            return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.93 Safari/537.36"; //for default
+    }
+}
 
 public static string GetRandomResource(string resourceType)
 {
